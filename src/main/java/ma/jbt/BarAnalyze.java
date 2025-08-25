@@ -56,6 +56,8 @@ public class BarAnalyze {
 				
 				}
 			}
+
+			// the last bar's close price for each security is the latest price (during the backtest)
 			finalPrices.put(currSecName, curr.getClose());
 			logger.log("------------");
 		}

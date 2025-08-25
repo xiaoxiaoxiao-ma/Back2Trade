@@ -18,7 +18,6 @@ import com.ib.client.Contract;
 import com.ib.client.EClientSocket;
 import com.ib.client.EJavaSignal;
 import com.ib.client.EReader;
-import com.ib.client.Types.SecType;
 
 // 加用户持仓的证券代码 数量 然后存储/读取 并获取报价 按要求货币计算盈亏
 // 联动python实现回测
@@ -36,7 +35,8 @@ public class Main {
 	private static EJavaSignal signal;
 	private static MyWrapper wrapper;
 	
-	private static Map<String,List<MBar>> barList;
+	private static Map<String,List<MBar>> secBarsMap;
+    // contains all loaded securities' names and their barLists
 	
 	private static final String ADDRESS = "127.0.0.1";
 	private static final int PORT = 7496;
@@ -59,7 +59,7 @@ public class Main {
 		}
         // init csv directory
 
-        barList = new HashMap<String,List<MBar>>();
+        secBarsMap = new HashMap<String,List<MBar>>();
 		
 		Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -76,13 +76,14 @@ public class Main {
         }
         System.out.println("\tq\tquit");
         System.out.println("------------");
+        System.out.println();
         
 		String command1 = scanner.nextLine();
 		System.out.println("read: " + command1);
         if(command1.equals("info")) {
-            System.out.println(barList.size() + " securities have been loaded" );
-            for (String key : barList.keySet()) {
-                System.out.println(key + " has " + barList.get(key).size() +" bars");
+            System.out.println(secBarsMap.size() + " securities have been loaded" );
+            for (String key : secBarsMap.keySet()) {
+                System.out.println(key + " has " + secBarsMap.get(key).size() +" bars");
             }
         }
 		if (command1.equals("l")) {
@@ -91,7 +92,7 @@ public class Main {
 			String fileName = scanner.nextLine();
             // System.out.println("Read: " + fileName);
             try {
-			barList.put(
+			secBarsMap.put(
                 fileName.substring(0,fileName.indexOf(".")),
                 DataSource.loadDataFromLocalFile(CSV_PATH + fileName)
                 );
@@ -103,7 +104,7 @@ public class Main {
 		}
         else if (command1.equals("t")) {
             BarAnalyze ba = new BarAnalyze("MyAnalyze1");
-            ba.MyAnalyze1(barList);
+            ba.MyAnalyze1(secBarsMap);
         }
         else if (command1.equals("q")) {
             break;
@@ -133,7 +134,7 @@ public class Main {
 		String securityType = scanner.nextLine();
 		System.out.println("Please Enter Code:");
 		currentSecName = scanner.nextLine();
-		barList.put(currentSecName, new ArrayList<>());
+		secBarsMap.put(currentSecName, new ArrayList<>());
         contract.symbol(currentSecName);
         contract.secType(securityType);
         if (securityType.equals("CASH")) {
@@ -221,7 +222,7 @@ public class Main {
              */
     }
 	public static void addMBar(MBar b) {
-		barList.get(currentSecName).add(b);
+		secBarsMap.get(currentSecName).add(b);
 	}
 	
 	public static void connectedToServer() {
@@ -239,7 +240,7 @@ public class Main {
 		try {
             // save current sec's bar chart (.csv) to specific filePath
 			PrintWriter pw = new PrintWriter(new FileWriter(CSV_PATH + currentSecName +".csv"));
-			BarUtils.barsToCSV(barList.get(currentSecName), pw, false);
+			BarUtils.barsToCSV(secBarsMap.get(currentSecName), pw, false);
 			pw.close();
 		} catch (IOException e) {
             System.err.print("Error(saveBarList): ");
