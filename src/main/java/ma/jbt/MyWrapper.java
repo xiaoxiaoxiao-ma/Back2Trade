@@ -389,13 +389,11 @@ private static Logger logger = new Logger("Server");
 		// count: 成交笔数
 		
 	}
-
 	@Override
 	public void receiveFA(int arg0, String arg1) {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void replaceFAEnd(int arg0, String arg1) {
 		// TODO Auto-generated method stub

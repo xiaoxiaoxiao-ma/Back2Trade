@@ -11,3 +11,4 @@ out/
 *.keystore *.pem *.p12 *.jks
 *.csv
 ibgateway*/ **/tws.settings
+lib/TwsApi.jar
