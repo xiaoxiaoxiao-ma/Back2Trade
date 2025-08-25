@@ -5,6 +5,11 @@ JDK 17+
 Maven
 (Optional 可选) 
 
+下载IBKR的TWS API  
+Download TWSAPI by IBKR:  
+`https://interactivebrokers.github.io/#`  
+将twsApi.jar放在项目lib/目录下  
+
 从官网下载IBKR Trader Workstation  
 Download IBKR Trader Workstation from offical website  
 `https://www.interactivebrokers.com/en/trading/tws.php#tws-software`
