@@ -1,0 +1,13 @@
+target/
+build/
+out/
+*.iml
+.idea/
+.vscode/
+*.log
+*.DS_Store
+*.env
+.env.*
+*.keystore *.pem *.p12 *.jks
+*.csv
+ibgateway*/ **/tws.settings
