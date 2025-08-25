@@ -65,6 +65,7 @@ public class Main {
         while (true) {
         System.out.println("------ backTrader-Xiaoxiao ------");
 		System.out.println("\tl\tload data from .csv file");
+        System.out.println("\tla\tload all .csv files at " + CSV_PATH);
         if (!isConnected) {
             System.out.println("\tc\tconnect to IBKR server (enable all TWS funtcions)");
         }
@@ -84,6 +85,25 @@ public class Main {
             System.out.println(secBarsMap.size() + " securities have been loaded" );
             for (String key : secBarsMap.keySet()) {
                 System.out.println(key + " has " + secBarsMap.get(key).size() +" bars");
+            }
+        }
+
+        if (command1.equals("la")) {
+            File folder = new File(CSV_PATH);
+            System.out.println(CSV_PATH + "->");
+            for (File subFile : folder.listFiles()) {
+                String fileName = subFile.getName();
+                System.out.println("\t\tloading: " + fileName);
+                try {
+			secBarsMap.put(
+                fileName.substring(0,fileName.indexOf(".")),
+                DataSource.loadDataFromLocalFile(CSV_PATH + fileName)
+                );
+            // retrieve secName from fileName (exclude the extend name)
+            } catch (Exception e) {
+                System.out.println("Cannot open file name " + fileName + " due to ");
+                e.printStackTrace();
+            }
             }
         }
 		if (command1.equals("l")) {
@@ -129,8 +149,7 @@ public class Main {
 		System.out.println("FUT : Future");
 		System.out.println("CASH : Forex");
 		System.out.println("IND : Index");
-		
-
+        
 		String securityType = scanner.nextLine();
 		System.out.println("Please Enter Code:");
 		currentSecName = scanner.nextLine();
@@ -184,6 +203,7 @@ public class Main {
         
     }
 
+    // end of the main loop
     // if connected to server, close connection
     if (isConnected) {
         try {
@@ -210,16 +230,6 @@ public class Main {
     public static void addBar(Bar b) {
             MBar mb = new MBar(b);
             addMBar(mb);
-            /* 
-             *BarTimeParser.convertToCsvFormat(bar.time()),
-                bar.open(),
-                bar.high(),
-                bar.low(),
-                bar.close(),
-                bar.volume().toString(),
-                bar.count(),
-                bar.wap().toString()
-             */
     }
 	public static void addMBar(MBar b) {
 		secBarsMap.get(currentSecName).add(b);
