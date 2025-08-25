@@ -1,4 +1,5 @@
-Java 回测+量化交易：支持本地 CSV 与 IBKR（可扩展更多数据源）
+Java 回测+量化交易：支持本地 CSV 与 IBKR（可扩展更多数据源）  
+开发环境为MacOS 15.6  
 
 # Prerequisites / 前置依赖
 JDK 17+
@@ -26,15 +27,15 @@ mvn install:install-file \
 
 # Build / 构建
 ```
-  mvn -DskipTests package
+  mvn -DskipTests package  
 ```
 
 # Run / 运行
-打开Trader Workstation
-登录账户
-打开File -> Global Configuration -> API -> Settings -> Enable ActiveX and Socket Clients
-确定Socket port为7496
-
+打开Trader Workstation  
+登录账户  
+打开File -> Global Configuration -> API -> Settings -> Enable ActiveX and Socket Clients  
+确定Socket port为7496  
+  
 ```
 java -jar target/main-1.0.0-SNAPSHOT.jar
 ```
