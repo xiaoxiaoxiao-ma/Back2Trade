@@ -68,6 +68,7 @@ public class DataSource {
 
 		long endTime = System.currentTimeMillis();
 		System.out.println(i +" bars have been loaded (" + (endTime - startTime) + "ms)");
+		System.out.println();
 		return bars;
 	}
 }

@@ -32,6 +32,8 @@ import com.ib.client.TickAttribBidAsk;
 import com.ib.client.TickAttribLast;
 import com.ib.client.TickType;
 
+import ma.HistoricalNewsParser;
+
 public class MyWrapper implements EWrapper{
 
 private static Logger logger = new Logger("Server");
@@ -160,7 +162,7 @@ private static Logger logger = new Logger("Server");
 		if (CONN_INFO.contains(errorCode)) {
 			logger.log("connection: " + errorMsg);
 		} else {
-			logger.log("error:" + id + errorCode + " "+ errorMsg + " " + advancedOrderRejectJson);
+			logger.log("error: id:" + id  + " code: " + errorCode + " "+ errorMsg + " " + advancedOrderRejectJson);
 		}
 	}
 
@@ -237,9 +239,12 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void historicalNews(int arg0, String arg1, String arg2, String arg3, String arg4) {
-		// TODO Auto-generated method stub
-		
+	public void historicalNews(int reqId, String time, String providerCode, String articleId, String rawHeadline) {
+		Logger newsLogger = new Logger("HNews");
+		newsLogger.log("historicalNews id: " + reqId + " providerCode: " + providerCode + " articleId: " + articleId);
+		var p = HistoricalNewsParser.parse(rawHeadline);
+		newsLogger.log("\tk-value:" + p.sentimentK() + " c-value: " + p.confidenceC());
+		newsLogger.log("\tNews headline: " + p.text());
 	}
 
 	@Override
@@ -303,9 +308,13 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void newsProviders(NewsProvider[] arg0) {
-		// TODO Auto-generated method stub
-		
+	public void newsProviders(NewsProvider[] providers) {
+		logger.log("news providers:");
+		int i = 2001;
+		for (NewsProvider provider: providers) {
+			logger.log("\tcode:" + provider.providerCode() + " name: " + provider.providerName());
+			Main.requestHistoryNews(i++, provider.providerCode());
+		}
 	}
 
 	@Override
@@ -605,14 +614,14 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void wshEventData(int arg0, String arg1) {
-		// TODO Auto-generated method stub
+	public void wshEventData(int reqId, String dataJson) {
+		logger.log("wshEventData: " + dataJson);
 		
 	}
 
 	@Override
-	public void wshMetaData(int arg0, String arg1) {
-		// TODO Auto-generated method stub
+	public void wshMetaData(int reqId, String arg1) {
+		logger.log("wshMetaData: " + arg1);
 		
 	}
 }

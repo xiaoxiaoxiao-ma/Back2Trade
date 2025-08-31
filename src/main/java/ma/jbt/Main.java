@@ -19,6 +19,12 @@ import com.ib.client.EClientSocket;
 import com.ib.client.EJavaSignal;
 import com.ib.client.EReader;
 
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.Ansi.*;
+import org.fusesource.jansi.Ansi.Color.*;
+import org.fusesource.jansi.AnsiConsole;
+
+
 // 加用户持仓的证券代码 数量 然后存储/读取 并获取报价 按要求货币计算盈亏
 // 联动python实现回测
 // 请求离岸人民币
@@ -63,7 +69,8 @@ public class Main {
 		
 		Scanner scanner = new Scanner(System.in);
         while (true) {
-        System.out.println("------ backTrader-Xiaoxiao ------");
+        // System.out.println(  Ansi.ansi().render("@|red Hello|@ @|green World|@") );
+        System.out.println(Ansi.ansi().render("------ @|green backTrader-Xiaoxiao |@------"));
 		System.out.println("\tl\tload data from .csv file");
         System.out.println("\tla\tload all .csv files at " + CSV_PATH);
         if (!isConnected) {
@@ -99,6 +106,7 @@ public class Main {
                 fileName.substring(0,fileName.indexOf(".")),
                 DataSource.loadDataFromLocalFile(CSV_PATH + fileName)
                 );
+                
             // retrieve secName from fileName (exclude the extend name)
             } catch (Exception e) {
                 System.out.println("Cannot open file name " + fileName + " due to ");
@@ -170,19 +178,6 @@ public class Main {
             contract.exchange("SMART");
             contract.currency("USD");
         }
-		final EReader reader = new EReader(client,signal);
-		reader.start();
-        //An additional thread is created in this program design to empty the messaging queue
-        new Thread(() -> {
-            while (client.isConnected()) {
-                signal.waitForSignal();
-                try {
-                    reader.processMsgs();
-                } catch (Exception e) {
-                    System.out.println("Exception: "+e.getMessage());
-                }
-            }
-        }).start();
 		try {
 			Thread.sleep(1000);
 		}
@@ -191,7 +186,9 @@ public class Main {
 		}
 
         System.out.println("request sent");
+        // Id
         client.reqMktData(1001, contract, "233", false, false, null);
+        // client.reqWshEventData(1101, new WshEventData(8314, false, false, false, "20250830", "", 5));
         /*client.reqHistoricalData(1001, contract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null );*/
             try {
                 Thread.sleep(10000);
@@ -239,6 +236,21 @@ public class Main {
 		//client.reqMarketDataType(4);//delayed and frozen
         isConnected = true;
         System.out.println("Successfully connected to server!");
+        
+        final EReader reader = new EReader(client,signal);
+		reader.start();
+        new Thread(() -> {
+            while (client.isConnected()) {
+                signal.waitForSignal();
+                try {
+                    reader.processMsgs();
+                } catch (Exception e) {
+                    System.out.println("Exception: "+ e.getMessage());
+                }
+            }
+        }).start();
+
+        client.reqNewsProviders();
 	}
     // caller: tws server (getHistoryData)
 	public static void endBarList() {
@@ -257,4 +269,8 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+
+    public static void requestHistoryNews(int id, String providerCode) {
+        client.reqHistoricalNews(id, 8314, providerCode, "", "", 10, null);
+    }
 }
