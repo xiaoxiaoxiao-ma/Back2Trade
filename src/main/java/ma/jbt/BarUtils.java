@@ -14,28 +14,31 @@ public static void barsToCSV(List<MBar> barList, PrintWriter pw, boolean convert
             String line;
             if (convertTime) {
             line = String.format(
-                "%s,%.5f,%.5f,%.5f,%.5f,%s",
+                "%s,%.5f,%.5f,%.5f,%.5f,%s,%s,%s",
                 BarTimeParser.convertToCsvFormat(bar.getTime()),
                 bar.getOpen(),
                 bar.getHigh(),
                 bar.getLow(),
                 bar.getClose(),
-                bar.getVolume()
-                //bar.count(),
-                //bar.wap().toString()
+                bar.getVolume(),
+                bar.getBarCount(),
+                bar.getWap()
             );
         } else {
             line = String.format(
-                        "%s,%.5f,%.5f,%.5f,%.5f,%s",
-                        bar.getTime(),
+                        "%s,%.5f,%.5f,%.5f,%.5f,%s,%s,%s",
+                        bar.getDate(),
                         bar.getOpen(),
                         bar.getHigh(),
                         bar.getLow(),
                         bar.getClose(),
-                        bar.getVolume()
+                        bar.getVolume(),
+                        bar.getBarCount(),
+                        bar.getWap()
                 );
         }
-            pw.println(line);
+        System.out.println(line);
+        pw.println(line);
         }
 
 	} catch (Exception e) {

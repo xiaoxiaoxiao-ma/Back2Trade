@@ -31,7 +31,7 @@ public class BarTimeParser {
     
     public static String convertToCsvFormat(String timeStr) {
         //DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss z", Locale.US);
-    	DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss", Locale.US);
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss", Locale.US);
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         // 解析字符串为 ZonedDateTime

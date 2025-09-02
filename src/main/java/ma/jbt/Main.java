@@ -79,7 +79,8 @@ public class Main {
         System.out.println("\tinfo\tget current status");
         System.out.println("\tt\tstart running backtests");
         if (isConnected) {
-            System.out.println("\tg\tfor load data from IBKR");
+            System.out.println("\tg\tget real-time data from IBKR");
+            System.out.println("\th\tget historical data from IBKR");
             // System.out.println("\ts\tstart receiving real-time data from server");
         }
         System.out.println("\tq\tquit");
@@ -149,7 +150,7 @@ public class Main {
         
         // connect to local tws server
         }
-        else if (command1.equals("g")) {
+        else if (command1.equals("g") || command1.equals("h")) {
 		Contract contract = new Contract();
 		
 		System.out.println("Please Enter Security Type:");
@@ -187,7 +188,12 @@ public class Main {
 
         System.out.println("request sent");
         // Id
+        if (command1.equals("g")) {
         client.reqMktData(1001, contract, "233", false, false, null);
+        } else {
+            // command1 == "s"
+            client.reqHistoricalData(1001, contract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null );
+        }
         // client.reqWshEventData(1101, new WshEventData(8314, false, false, false, "20250830", "", 5));
         /*client.reqHistoricalData(1001, contract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null );*/
             try {
@@ -271,6 +277,7 @@ public class Main {
 	}
 
     public static void requestHistoryNews(int id, String providerCode) {
+        // reqId, conId
         client.reqHistoricalNews(id, 8314, providerCode, "", "", 10, null);
     }
 }

@@ -44,7 +44,7 @@ public class DataSource {
 				try {
 					// parse date from saved bar's csv data
 					Date date = sdf.parse(parts[0].trim());
-					bar.setDate(date);
+					bar.setDate(date.toString());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -56,6 +56,8 @@ public class DataSource {
 				bar.setVolume(	Long.parseLong(parts[5].trim()));
 				bar.setBarCount(Integer.parseInt(parts[6].trim()));
 				bar.setAverage(	Double.parseDouble(parts[7].trim()));
+				bar.setWap(parts[7].trim());
+				// wap == average
 
 				System.out.println("One bar has been loaded: " + bar.toString());
 				bars.add(bar);

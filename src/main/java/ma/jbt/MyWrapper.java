@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.fusesource.jansi.Ansi;
+
 import com.ib.client.Bar;
 import com.ib.client.CommissionReport;
 import com.ib.client.Contract;
@@ -239,12 +241,36 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void historicalNews(int reqId, String time, String providerCode, String articleId, String rawHeadline) {
-		Logger newsLogger = new Logger("HNews");
-		newsLogger.log("historicalNews id: " + reqId + " providerCode: " + providerCode + " articleId: " + articleId);
+	public void historicalNews(
+		int reqId, 
+		String time, 
+		String providerCode, 
+		String articleId, 
+		String rawHeadline) {
+		// Logger newsLogger = new Logger("HNews");
+		// newsLogger.log("historicalNews id: " + reqId + " providerCode: " + providerCode + " articleId: " + articleId);
 		var p = HistoricalNewsParser.parse(rawHeadline);
-		newsLogger.log("\tk-value:" + p.sentimentK() + " c-value: " + p.confidenceC());
-		newsLogger.log("\tNews headline: " + p.text());
+		//newsLogger.log("\tk-value:" + p.sentimentK() + " c-value: " + p.confidenceC());
+		//newsLogger.log("\tNews headline: " + p.text());
+
+		if (
+			p.confidenceC() != null &&
+			p.sentimentK() != null &&
+			p.confidenceC() > 0.9 &&
+			Math.abs(p.sentimentK()) > 0.5
+		) {
+			// System.out.println(Ansi.ansi().render("------ @|green backTrader-Xiaoxiao |@------"));
+
+			String color = "";
+			if (p.sentimentK() > 0) {
+				color = "@|green ";
+			} else {
+				color = "@|red ";
+			}
+
+			System.out.println(Ansi.ansi().render("[C: @|cyan " + p.confidenceC() + "|@ K: " + color + p.sentimentK() + "|@ " + time + "]" + p.text()));
+
+		}
 	}
 
 	@Override
@@ -505,7 +531,12 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void tickNews(int arg0, long arg1, String arg2, String arg3, String arg4, String arg5) {
+	public void tickNews(int tickerId,
+						long timeStamp,
+						String providerCode,
+						String articleId,
+						String headline,
+						String extraData){
 		// TODO Auto-generated method stub
 		
 	}
@@ -523,14 +554,14 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void tickReqParams(int arg0, double arg1, String arg2, int arg3) {
-		// TODO Auto-generated method stub
+	public void tickReqParams(int tickerId, double minTick, String bboExchange, int snapshotPermissions) {
+		logger.debug("tickReqParams: tickerId:" + tickerId + "minTick: " + minTick + " bboExchange: " + bboExchange + " snapshotPremissions: " + snapshotPermissions);
 		
 	}
 
 	@Override
-	public void tickSize(int arg0, int arg1, Decimal arg2) {
-		// TODO Auto-generated method stub
+	public void tickSize(int tickerId, int field, Decimal size) {
+		logger.debug("tickSize: id:" + tickerId + " field:" + TickType.getField(field) + " size: " + size.longValue());
 		
 	}
 
@@ -543,6 +574,11 @@ private static Logger logger = new Logger("Server");
 	@Override
 	public void tickString(int tickerId, int field, String value) {
 		logger.debug("tickString:" + tickerId + " " + TickType.getField(field) + " value: " + value);
+		if (TickType.getField(field).equals("lastTimestamp")) {
+			long ping = (System.currentTimeMillis() / 1000) - Long.parseLong(value);
+			//logger.debug("currTime:" + (System.currentTimeMillis() / 1000) + "received: " + value);
+			logger.log("delay: " + ping + "s");
+		}
 	}
 
 	@Override
