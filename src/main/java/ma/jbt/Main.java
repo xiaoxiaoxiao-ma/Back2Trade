@@ -23,6 +23,7 @@ import ma.jbt.cli.LoadAllCommandHandler;
 import ma.jbt.cli.LoadCommandHandler;
 import ma.jbt.cli.NewsCommandHandler;
 import ma.jbt.cli.QuitCommandHandler;
+import ma.jbt.cli.TickPriceCommandHandler;
 import ma.jbt.cli.AnalyzeCommandHandler;
 import ma.jbt.cli.CommandHandler;
 import ma.jbt.cli.CommandRegistry;
@@ -81,15 +82,16 @@ public class Main {
         secBarsMap = new HashMap<String,List<MBar>>();
 		scanner = new Scanner(System.in);
         commandRegistry = new CommandRegistry();
-        commandRegistry.register("info", new InfoCommandHandler());
-        commandRegistry.register("la", new LoadAllCommandHandler());
-        commandRegistry.register("q", new QuitCommandHandler());
-        commandRegistry.register("l", new LoadCommandHandler());
-        commandRegistry.register("t", new AnalyzeCommandHandler());
-        commandRegistry.register("c", new ConnectCommandHandler());
-        commandRegistry.register("g", new LiveDataCommandHandler());
-        commandRegistry.register("h", new HistoricalDataCommandHandler());
-        commandRegistry.register("n", new NewsCommandHandler());
+        commandRegistry.register("info", "get current status", new InfoCommandHandler());
+        commandRegistry.register("la", "load all .csv files at " + CSV_PATH, new LoadAllCommandHandler());
+        commandRegistry.register("q", "quit", new QuitCommandHandler());
+        commandRegistry.register("l", "load data from .csv file", new LoadCommandHandler());
+        commandRegistry.register("t","start running backtests", new AnalyzeCommandHandler());
+        commandRegistry.register("c", "connect to IBKR server (enable all TWS funtcions)", new ConnectCommandHandler());
+        commandRegistry.register("g", "get real-time data from IBKR", new LiveDataCommandHandler());
+        commandRegistry.register("h", "get historical data from IBKR", new HistoricalDataCommandHandler());
+        commandRegistry.register("n", "get news", new NewsCommandHandler());
+        commandRegistry.register("tp", "get tick price", new TickPriceCommandHandler());
 
         while (!exitFlag) {
         printWelcomeMessage();
@@ -208,7 +210,7 @@ public class Main {
     public static void printWelcomeMessage() {
         // System.out.println(  Ansi.ansi().render("@|red Hello|@ @|green World|@") );
         System.out.println(Ansi.ansi().render("------ @|green backTrader-Xiaoxiao |@------"));
-		System.out.println("\tl\tload data from .csv file");
+		/*System.out.println("\tl\tload data from .csv file");
         System.out.println("\tla\tload all .csv files at " + CSV_PATH);
         if (!isConnected) {
             System.out.println("\tc\tconnect to IBKR server (enable all TWS funtcions)");
@@ -221,6 +223,8 @@ public class Main {
             // System.out.println("\ts\tstart receiving real-time data from server");
         }
         System.out.println("\tq\tquit");
+        */
+        commandRegistry.printUsage();
         System.out.println("------------");
         System.out.println();
     }

@@ -506,16 +506,23 @@ private static Logger logger = new Logger("Server");
 	}
 
 	@Override
-	public void tickByTickBidAsk(int arg0, long arg1, double arg2, double arg3, Decimal arg4, Decimal arg5,
-			TickAttribBidAsk arg6) {
-		// TODO Auto-generated method stub
+	public void tickByTickBidAsk(int reqId,
+        long time,
+        double bidPrice,
+        double askPrice,
+        Decimal bidSize,
+        Decimal askSize,
+        TickAttribBidAsk attrib) {
+		logger.log("tickByTickBidAsk", "id: " + reqId + " time: " + time);
+		logger.log("bid: \t" + bidPrice + "\task: \t" + askPrice);
+		logger.log("bSize: \t" + bidSize + "\taSize: \t" +askSize);
+		
 		
 	}
 
 	@Override
 	public void tickByTickMidPoint(int arg0, long arg1, double arg2) {
-		// TODO Auto-generated method stub
-		
+		logger.log("tickByTickMidPoint" + arg0 + ", " + arg1 + ", " + arg2);
 	}
 
 	@Override
