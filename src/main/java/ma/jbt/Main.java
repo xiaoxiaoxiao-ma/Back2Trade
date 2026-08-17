@@ -7,23 +7,31 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import com.ib.client.Bar;
-import com.ib.client.Contract;
 import com.ib.client.EClientSocket;
 import com.ib.client.EJavaSignal;
 import com.ib.client.EReader;
 
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.Ansi.*;
-import org.fusesource.jansi.Ansi.Color.*;
-import org.fusesource.jansi.AnsiConsole;
+import ma.jbt.cli.InfoCommandHandler;
+import ma.jbt.cli.LiveDataCommandHandler;
+import ma.jbt.cli.LoadAllCommandHandler;
+import ma.jbt.cli.LoadCommandHandler;
+import ma.jbt.cli.NewsCommandHandler;
+import ma.jbt.cli.QuitCommandHandler;
+import ma.jbt.cli.AnalyzeCommandHandler;
+import ma.jbt.cli.CommandHandler;
+import ma.jbt.cli.CommandRegistry;
+import ma.jbt.cli.ConnectCommandHandler;
+import ma.jbt.cli.HistoricalDataCommandHandler;
 
+import org.fusesource.jansi.Ansi;
+
+// Lanterna dashboard + JLine command shell
 
 // 加用户持仓的证券代码 数量 然后存储/读取 并获取报价 按要求货币计算盈亏
 // 联动python实现回测
@@ -40,16 +48,21 @@ public class Main {
 	private static EClientSocket client;
 	private static EJavaSignal signal;
 	private static MyWrapper wrapper;
+
+    private static CommandRegistry commandRegistry;
 	
 	private static Map<String,List<MBar>> secBarsMap;
     // contains all loaded securities' names and their barLists
 	
 	private static final String ADDRESS = "127.0.0.1";
 	private static final int PORT = 7496;
-	private static final String HOME_PATH = System.getProperty("user.home");
-	private static final String CSV_PATH = HOME_PATH + "/Documents/jbt/";
+	public static final String HOME_PATH = System.getProperty("user.home");
+	public static final String CSV_PATH = HOME_PATH + "/Documents/jbt/";
 
     private static boolean isConnected = false;
+    private static boolean exitFlag = false;
+
+    private static Scanner scanner;
 	
 	String[] m7symbols = {"AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", "TSLA"};
 	
@@ -66,150 +79,37 @@ public class Main {
         // init csv directory
 
         secBarsMap = new HashMap<String,List<MBar>>();
-		
-		Scanner scanner = new Scanner(System.in);
-        while (true) {
-        // System.out.println(  Ansi.ansi().render("@|red Hello|@ @|green World|@") );
-        System.out.println(Ansi.ansi().render("------ @|green backTrader-Xiaoxiao |@------"));
-		System.out.println("\tl\tload data from .csv file");
-        System.out.println("\tla\tload all .csv files at " + CSV_PATH);
-        if (!isConnected) {
-            System.out.println("\tc\tconnect to IBKR server (enable all TWS funtcions)");
-        }
-        System.out.println("\tinfo\tget current status");
-        System.out.println("\tt\tstart running backtests");
-        if (isConnected) {
-            System.out.println("\tg\tget real-time data from IBKR");
-            System.out.println("\th\tget historical data from IBKR");
-            // System.out.println("\ts\tstart receiving real-time data from server");
-        }
-        System.out.println("\tq\tquit");
-        System.out.println("------------");
-        System.out.println();
+		scanner = new Scanner(System.in);
+        commandRegistry = new CommandRegistry();
+        commandRegistry.register("info", new InfoCommandHandler());
+        commandRegistry.register("la", new LoadAllCommandHandler());
+        commandRegistry.register("q", new QuitCommandHandler());
+        commandRegistry.register("l", new LoadCommandHandler());
+        commandRegistry.register("t", new AnalyzeCommandHandler());
+        commandRegistry.register("c", new ConnectCommandHandler());
+        commandRegistry.register("g", new LiveDataCommandHandler());
+        commandRegistry.register("h", new HistoricalDataCommandHandler());
+        commandRegistry.register("n", new NewsCommandHandler());
+
+        while (!exitFlag) {
+        printWelcomeMessage();
         
 		String command1 = scanner.nextLine();
 		System.out.println("read: " + command1);
-        if(command1.equals("info")) {
-            System.out.println(secBarsMap.size() + " securities have been loaded" );
-            for (String key : secBarsMap.keySet()) {
-                System.out.println(key + " has " + secBarsMap.get(key).size() +" bars");
-            }
-        }
-
-        if (command1.equals("la")) {
-            File folder = new File(CSV_PATH);
-            System.out.println(CSV_PATH + "->");
-            for (File subFile : folder.listFiles()) {
-                String fileName = subFile.getName();
-                System.out.println("\t\tloading: " + fileName);
-                try {
-			secBarsMap.put(
-                fileName.substring(0,fileName.indexOf(".")),
-                DataSource.loadDataFromLocalFile(CSV_PATH + fileName)
-                );
-                
-            // retrieve secName from fileName (exclude the extend name)
-            } catch (Exception e) {
-                System.out.println("Cannot open file name " + fileName + " due to ");
-                e.printStackTrace();
-            }
-            }
-        }
-		if (command1.equals("l")) {
-            printFilesInDir(CSV_PATH);
-			System.out.print("Please enter .csv file full name: ");
-			String fileName = scanner.nextLine();
-            // System.out.println("Read: " + fileName);
-            try {
-			secBarsMap.put(
-                fileName.substring(0,fileName.indexOf(".")),
-                DataSource.loadDataFromLocalFile(CSV_PATH + fileName)
-                );
-            // retrieve secName from fileName (exclude the extend name)
-            } catch (Exception e) {
-                System.out.println("Cannot open file name " + fileName + " due to ");
-                e.printStackTrace();
-            }
-		}
-        else if (command1.equals("t")) {
-            BarAnalyze ba = new BarAnalyze("MyAnalyze1");
-            ba.MyAnalyze1(secBarsMap);
-        }
-        else if (command1.equals("q")) {
-            break;
-        }
-        else if (command1.equals("s")) {
-            
-        }
-        else if (command1.equals("c")) {
-		signal = new EJavaSignal();
-		wrapper = new MyWrapper();
-		client = new EClientSocket(wrapper, signal);
-        // Init tws related services
-		client.eConnect(ADDRESS, PORT, 0);
         
-        // connect to local tws server
-        }
-        else if (command1.equals("g") || command1.equals("h")) {
-		Contract contract = new Contract();
-		
-		System.out.println("Please Enter Security Type:");
-		System.out.println("STK : Stock");
-		System.out.println("FUT : Future");
-		System.out.println("CASH : Forex");
-		System.out.println("IND : Index");
-        
-		String securityType = scanner.nextLine();
-		System.out.println("Please Enter Code:");
-		currentSecName = scanner.nextLine();
-		secBarsMap.put(currentSecName, new ArrayList<>());
-        contract.symbol(currentSecName);
-        contract.secType(securityType);
-        if (securityType.equals("CASH")) {
-            // if secType equals to forex, change currency type
-            // eg. input: GBPUSD, symbol GBP, currency USD
-            contract.symbol(currentSecName.substring(0,3));
-            contract.currency(currentSecName.substring(3));
-            contract.exchange("IDEALPRO");
-            Logger log = new Logger("FOREX");
-            log.debug(securityType);
-
+        CommandHandler handler = commandRegistry.get(command1);
+        if (handler != null) {
+            handler.exec(null);
         } else {
-            // if secType is not Forex
-            contract.exchange("SMART");
-            contract.currency("USD");
+            System.out.println("Cannot find command");
         }
-		try {
-			Thread.sleep(1000);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-
-        System.out.println("request sent");
-        // Id
-        if (command1.equals("g")) {
-        client.reqMktData(1001, contract, "233", false, false, null);
-        } else {
-            // command1 == "s"
-            client.reqHistoricalData(1001, contract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null );
-        }
-        // client.reqWshEventData(1101, new WshEventData(8314, false, false, false, "20250830", "", 5));
-        /*client.reqHistoricalData(1001, contract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null );*/
-            try {
-                Thread.sleep(10000);
-            } catch (Exception e) {
-                    e.printStackTrace();
-                }
-        
-        }
-        
     }
 
     // end of the main loop
     // if connected to server, close connection
     if (isConnected) {
         try {
+            System.out.println("disconnecting...");
             client.eDisconnect();
         } catch(Exception e) {
             System.err.print("Error(disconnect): ");
@@ -237,13 +137,22 @@ public class Main {
 	public static void addMBar(MBar b) {
 		secBarsMap.get(currentSecName).add(b);
 	}
+
+    public static void tryConnectToServer() {
+        signal = new EJavaSignal();
+        wrapper = new MyWrapper();
+        client = new EClientSocket(wrapper, signal);
+        // Init tws related services
+        client.eConnect(ADDRESS, PORT, 0);
+        // connect to local tws server
+    }
 	
 	public static void connectedToServer() {
 		//client.reqMarketDataType(4);//delayed and frozen
         isConnected = true;
         System.out.println("Successfully connected to server!");
         
-        final EReader reader = new EReader(client,signal);
+        final EReader reader = new EReader(client, signal);
 		reader.start();
         new Thread(() -> {
             while (client.isConnected()) {
@@ -275,6 +184,46 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+
+    public static Map<String,List<MBar>> getSecBarsMap() {
+        return secBarsMap;
+    }
+
+    public static void requestExit() {
+        exitFlag = true;
+    }
+
+    public static Scanner getScanner() {
+        return scanner;
+    }
+
+    public static EClientSocket getClient() {
+        return client;
+    }
+
+    public static void setCurrentSecName(String newCurrentSecName) {
+        currentSecName = newCurrentSecName;
+    }
+
+    public static void printWelcomeMessage() {
+        // System.out.println(  Ansi.ansi().render("@|red Hello|@ @|green World|@") );
+        System.out.println(Ansi.ansi().render("------ @|green backTrader-Xiaoxiao |@------"));
+		System.out.println("\tl\tload data from .csv file");
+        System.out.println("\tla\tload all .csv files at " + CSV_PATH);
+        if (!isConnected) {
+            System.out.println("\tc\tconnect to IBKR server (enable all TWS funtcions)");
+        }
+        System.out.println("\tinfo\tget current status");
+        System.out.println("\tt\tstart running backtests");
+        if (isConnected) {
+            System.out.println("\tg\tget real-time data from IBKR");
+            System.out.println("\th\tget historical data from IBKR");
+            // System.out.println("\ts\tstart receiving real-time data from server");
+        }
+        System.out.println("\tq\tquit");
+        System.out.println("------------");
+        System.out.println();
+    }
 
     public static void requestHistoryNews(int id, String providerCode) {
         // reqId, conId

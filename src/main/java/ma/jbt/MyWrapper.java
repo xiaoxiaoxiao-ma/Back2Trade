@@ -158,6 +158,7 @@ private static Logger logger = new Logger("Server");
 
 
 	private static final Set<Integer> CONN_INFO = Set.of(2102,2103,2105,2106,2156,2157);
+
 	// connection related
 	@Override
 	public void error(int id, int errorCode, String errorMsg, String advancedOrderRejectJson) {
@@ -537,7 +538,9 @@ private static Logger logger = new Logger("Server");
 						String articleId,
 						String headline,
 						String extraData){
-		// TODO Auto-generated method stub
+		logger.log("NEWS", "id: "+tickerId + " timeStamp: " + timeStamp + " providerCode: " + providerCode + " articleId:" + articleId);
+		logger.log("NEWS", "Headline: " + headline);
+		logger.log("NEWS", "extraData: " + extraData);
 		
 	}
 
