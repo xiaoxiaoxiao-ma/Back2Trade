@@ -14,6 +14,12 @@ public class TickPriceCommandHandler extends DataCommandHandler {
         super.exec(args);
         Contract contract = getContract();
         EClientSocket client = Main.getClient();
+        
+        if (client == null) {
+            System.out.println("not connected to server");
+            return;
+        }
+
         client.reqTickByTickData(
             2001,       // tickerId / reqId
             contract,

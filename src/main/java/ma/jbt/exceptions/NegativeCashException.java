@@ -1,4 +1,4 @@
-package ma.jbt;
+package ma.jbt.exceptions;
 
 public class NegativeCashException extends RuntimeException {
     public NegativeCashException(String message) {

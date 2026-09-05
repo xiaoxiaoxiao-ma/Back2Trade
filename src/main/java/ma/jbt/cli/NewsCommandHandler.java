@@ -1,14 +1,9 @@
 package ma.jbt.cli;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
 import com.ib.client.Contract;
 import com.ib.client.EClientSocket;
-
-import ma.jbt.Logger;
-import ma.jbt.MBar;
 import ma.jbt.Main;
 
 public class NewsCommandHandler implements CommandHandler {

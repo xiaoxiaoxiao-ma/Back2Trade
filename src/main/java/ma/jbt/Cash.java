@@ -3,13 +3,14 @@ package ma.jbt;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import ma.jbt.exceptions.NegativeCashException;
+
 public class Cash {
+
     private String name;
     private BigDecimal cashAmount = new BigDecimal(0);
-
     private boolean canBeNegative = false;
-
-    private DecimalFormat valueFormat = new DecimalFormat("#.##");
+    private static DecimalFormat valueFormat = new DecimalFormat("#.##");
     
     public Cash(String cashName) {
         this.name = cashName;

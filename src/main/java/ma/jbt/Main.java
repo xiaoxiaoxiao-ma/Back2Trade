@@ -96,10 +96,9 @@ public class Main {
         while (!exitFlag) {
         printWelcomeMessage();
         
-		String command1 = scanner.nextLine();
-		System.out.println("read: " + command1);
+		String command = scanner.nextLine();
         
-        CommandHandler handler = commandRegistry.get(command1);
+        CommandHandler handler = commandRegistry.get(command);
         if (handler != null) {
             handler.exec(null);
         } else {
@@ -208,22 +207,7 @@ public class Main {
     }
 
     public static void printWelcomeMessage() {
-        // System.out.println(  Ansi.ansi().render("@|red Hello|@ @|green World|@") );
         System.out.println(Ansi.ansi().render("------ @|green backTrader-Xiaoxiao |@------"));
-		/*System.out.println("\tl\tload data from .csv file");
-        System.out.println("\tla\tload all .csv files at " + CSV_PATH);
-        if (!isConnected) {
-            System.out.println("\tc\tconnect to IBKR server (enable all TWS funtcions)");
-        }
-        System.out.println("\tinfo\tget current status");
-        System.out.println("\tt\tstart running backtests");
-        if (isConnected) {
-            System.out.println("\tg\tget real-time data from IBKR");
-            System.out.println("\th\tget historical data from IBKR");
-            // System.out.println("\ts\tstart receiving real-time data from server");
-        }
-        System.out.println("\tq\tquit");
-        */
         commandRegistry.printUsage();
         System.out.println("------------");
         System.out.println();

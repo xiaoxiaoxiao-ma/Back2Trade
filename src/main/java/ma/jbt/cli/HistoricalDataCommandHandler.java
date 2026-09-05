@@ -12,8 +12,12 @@ public class HistoricalDataCommandHandler extends DataCommandHandler {
     public void exec(List<String> args) {
         super.exec(args);
         EClientSocket client = Main.getClient();
-        Contract resulContract = getContract();
-        client.reqHistoricalData(1001, resulContract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null);
+        if (client == null) {
+            System.out.println("not connected to server");
+            return;
+        }
+        Contract resultContract = getContract();
+        client.reqHistoricalData(1001, resultContract, "", "1 Y", "1 day", "TRADES", 1, 1, false, null);
 
     }
 }

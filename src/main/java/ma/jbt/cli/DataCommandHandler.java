@@ -42,7 +42,7 @@ public abstract class DataCommandHandler implements CommandHandler {
             contract.symbol(currentSecName.substring(0,3));
             contract.currency(currentSecName.substring(3));
             contract.exchange("IDEALPRO");
-            Logger log = new Logger("FOREX");
+            Logger log = new Logger("DATA");
             log.debug(securityType);
 
         } else {
@@ -50,7 +50,8 @@ public abstract class DataCommandHandler implements CommandHandler {
             contract.exchange("SMART");
             contract.currency("USD");
         }
-		try {
+		/*
+        try {
 			Thread.sleep(1000);
 		}
 		catch(Exception e) {
@@ -58,6 +59,7 @@ public abstract class DataCommandHandler implements CommandHandler {
 		}
 
         System.out.println("request sent");
+        */
     }
 
     protected Contract getContract() {

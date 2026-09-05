@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import ma.jbt.DataSource;
 import ma.jbt.MBar;
 import ma.jbt.Main;
+import ma.jbt.data.DataSource;
 
 public class LoadAllCommandHandler implements CommandHandler {
 

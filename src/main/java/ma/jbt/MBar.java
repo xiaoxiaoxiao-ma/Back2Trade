@@ -1,7 +1,5 @@
 package ma.jbt;
 
-// import java.util.Date;
-
 import com.ib.client.Bar;
 
 public class MBar {

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import ma.jbt.DataSource;
 import ma.jbt.MBar;
 import ma.jbt.Main;
+import ma.jbt.data.DataSource;
 
 public class LoadCommandHandler implements CommandHandler {
 
@@ -18,7 +18,6 @@ public class LoadCommandHandler implements CommandHandler {
         Main.printFilesInDir(Main.CSV_PATH);
 		System.out.print("Please enter .csv file full name: ");
 		String fileName = scanner.nextLine();
-        // System.out.println("Read: " + fileName);
         try {
             secBarsMap.put(
                 fileName.substring(0,fileName.indexOf(".")),

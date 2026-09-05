@@ -3,7 +3,7 @@ package ma.jbt;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
-public class Account{
+public class Account {
     private String name = "default";
     private BigDecimal cash;
     private BigDecimal initCash;
@@ -34,6 +34,7 @@ public class Account{
     }
 
     public void buyIn(String secName, double price, int quant) {
+
         BigDecimal priceBig = new BigDecimal(price);
         BigDecimal quantBig = new BigDecimal(quant);
         BigDecimal result = priceBig.multiply(quantBig);

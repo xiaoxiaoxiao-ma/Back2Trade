@@ -1,4 +1,4 @@
-package ma.jbt;
+package ma.jbt.data;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import ma.jbt.MBar;
 
 public class DataSource {
 
